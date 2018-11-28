@@ -8,6 +8,7 @@ Design of primer sequences easily from a provided sequence file.
 import sys
 import argparse
 from primer import Primer
+from converter import convert_seqs
 
 try:
     from Bio import SeqIO
@@ -61,7 +62,7 @@ def main():
     args = get_args()
     Fprimers = []
     Rprimers = []
-    seqs = list(SeqIO.parse(args.sequences, 'fasta'))
+    seqs = list(convert_seqs(args.sequences))
     for rec in seqs:
         Fprimers.append(Primer(rec.id,rec.seq, length=args.length, direction='F'))
         Rprimers.append(Primer(rec.id, rec.seq, length=args.length, direction='R'))
