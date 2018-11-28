@@ -37,8 +37,13 @@ def get_args():
     epi = """Easy peasy primer design."""
 
     try:
-        parser = argparse.ArgumentParser(description=desc, epilog=epi, prog='PrYmer')
-        parser.add_argument('sequences', action='store', help='The sequence file to design primers for.')
+        parser = argparse.ArgumentParser(description=desc, epilog=epi, prog='PrYmer.py')
+        parser.add_argument('-l,', '--length', action='store', default=20, type=int,
+                             help='Desired length of primer sequences.')
+        parser.add_argument('sequences', action='store',
+                            help='The sequence file to design primers for. '
+                                 'It is assumed all sequences are provided 5\' -> 3\' ')
+
 
         if len(sys.argv) == 1:
             parser.print_help(sys.stderr)
@@ -58,13 +63,13 @@ def main():
     Rprimers = []
     seqs = list(SeqIO.parse(args.sequences, 'fasta'))
     for rec in seqs:
-        Fprimers.append(Primer(rec.id,rec.seq, direction='F'))
-        Rprimers.append(Primer(rec.id, rec.seq, direction='R'))
+        Fprimers.append(Primer(rec.id,rec.seq, length=args.length, direction='F'))
+        Rprimers.append(Primer(rec.id, rec.seq, length=args.length, direction='R'))
 
     for a, b, c in zip(seqs, Fprimers, Rprimers):
-        print(a)
-        print(b)
-        print(c)
+        print("Target Sequence = " + str(a.seq))
+        print("Forward Primer = " + str(b))
+        print("Reverse Primer = " + str(c))
 
 
 

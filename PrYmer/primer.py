@@ -35,8 +35,11 @@ class Primer(Seq):
 #    def __repr__(self, name, _data):
 #        return "'Primer("+self.name+":"+self._data+")'"
 
-    def __str__(self):
+    def __repr__(self):
         return str(self.__class__.__name__ + "(" + self.name + '_' + self.direction + ": " + str(self.primerseq) + ")" )
+
+    def __str__(self):
+        return str(self.primerseq)
 
     def create_sequence(self, _data, direction, length, _method):
         """Return primer sequences for the input data
@@ -45,10 +48,7 @@ class Primer(Seq):
             if direction == 'F':
                 return _data[0:length]
             elif direction == 'R':
-                return _data[-length:]
-
-#                return super(Primer, self).reverse_complement(_data[-length:])
-
+                return _data[-length:].reverse_complement()
 
 
     def melting_temperature(self, primerseq, tmtype):
