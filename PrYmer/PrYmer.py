@@ -42,6 +42,8 @@ def get_args():
 
     try:
         parser = argparse.ArgumentParser(description=desc, epilog=epi, prog='PrYmer.py')
+        parser.add_argument('-v', '--verbose', action='store_true',
+                            help='Print additional information about the designed sequences (to STDERR')
         parser.add_argument('-l,', '--length', action='store', default=20, type=int,
                              help='Desired length of primer sequences.')
         parser.add_argument('-o', '--outfmt', action='store', choices=['fasta', 'comma', 'semi'], default='fasta',
@@ -68,21 +70,23 @@ def get_args():
 def main():
     """Easy primer design main function"""
     args = get_args()
-    Fprimers = []
-    Rprimers = []
+
     seqs = list(convert_seqs(args.sequences))
     # If a tempfile was created by convert_seqs, remove it
 
+    Fprimers = []
+    Rprimers = []
     for rec in seqs:
         f = Primer(rec.id, rec.seq, length=args.length, direction='F')
         r = Primer(rec.id, rec.seq, length=args.length, direction='R')
         Fprimers.append(SeqRecord(f, id=f.name, description="_" + f.direction))
         Rprimers.append(SeqRecord(r, id=r.name, description="_" + r.direction))
 
-    for a, b, c in zip(seqs, Fprimers, Rprimers):
-        sys.stderr.write("Target Sequence " + rec.id + " = " + "\n" + str(a.seq) + "\n")
-        sys.stderr.write("Forward Primer (5\'-> 3\') = " + str(b.seq) + "\n")
-        sys.stderr.write("Reverse Primer (5\'-> 3\') = " + str(c.seq) + "\n")
+    if args.verbose:
+        for a, b, c in zip(seqs, Fprimers, Rprimers):
+            sys.stderr.write("Target Sequence " + rec.id + " = " + "\n" + str(a.seq) + "\n")
+            sys.stderr.write("Forward Primer (5\'-> 3\') = " + str(b.seq) + "\n")
+            sys.stderr.write("Reverse Primer (5\'-> 3\') = " + str(c.seq) + "\n")
 
     if args.outfile:
         if not args.outfmt or args.outfmt == 'fasta':
@@ -98,7 +102,6 @@ def main():
                     sys.exit(1)
                 for i in itertools.chain(*zip(Fprimers, Rprimers)):
                     tfh.write(sep.join([str(i.id + i.description), str(i.seq) + "\n"]))
-
 
 
 if __name__ == '__main__':

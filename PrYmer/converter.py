@@ -30,7 +30,7 @@ def convert_seqs(infile):
         except AssertionError:
             raise InputFormatException("File extension implies genbank, but the first line doesn't look like a header.")
     # Genbank will need features extracted if CDSs
-        temp = NamedTemporaryFile(mode='w+a')
+        temp = NamedTemporaryFile(mode='w+a', delete=False)
         for rec in SeqIO.parse(infile, 'genbank'):
             all_features = [feat for feat in rec.features if feat.type == "CDS"]
             for f in all_features:
@@ -41,7 +41,8 @@ def convert_seqs(infile):
                 header = header.replace(' ', '_')
                 temp.write('>{}\n{}\n'.format(header, f.location.extract(rec).seq))
 
-        genbank_seqs = SeqIO.parse(temp.name, 'fasta')
         temp.close()
-
+        genbank_seqs = SeqIO.parse(temp.name, 'fasta')
+        print(temp.name)
+        #os.remove(temp.name)
         return genbank_seqs
