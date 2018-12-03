@@ -12,7 +12,6 @@ def convert_seqs(infile):
     from tempfile import NamedTemporaryFile
     import os
 
-    temp = NamedTemporaryFile(mode='w')
     with open(infile, 'r') as ifh:
        firstline = ifh.readline()
 
@@ -31,20 +30,18 @@ def convert_seqs(infile):
         except AssertionError:
             raise InputFormatException("File extension implies genbank, but the first line doesn't look like a header.")
     # Genbank will need features extracted if CDSs
+        temp = NamedTemporaryFile(mode='w+a')
+        for rec in SeqIO.parse(infile, 'genbank'):
+            all_features = [feat for feat in rec.features if feat.type == "CDS"]
+            for f in all_features:
+                try:
+                    header = f.qualifiers['gene'][0] + "_" + rec.id
+                except KeyError:
+                    header = f.qualifiers['locus_tag'][0] + "_" + rec.id
+                header = header.replace(' ', '_')
+                temp.write('>{}\n{}\n'.format(header, f.location.extract(rec).seq))
 
-        with open(temp.name, 'w') as tfh:
-            for rec in SeqIO.parse(infile, 'genbank'):
-                all_features = [feat for feat in rec.features if feat.type == "CDS"]
-                for f in all_features:
-                    try:
-                        header = f.qualifiers['gene'][0]
-                        header = header.replace(' ', '_')
-                    except KeyError:
-                        header = f.qualifiers['locus_tag']
-                    tfh.write('>{}\n{}'.format(header, f.location.extract(rec).seq))
+        genbank_seqs = SeqIO.parse(temp.name, 'fasta')
+        temp.close()
 
-        tfh.seek(0)
-        return SeqIO.parse(temp, 'fasta')
-
-    return temp
-
+        return genbank_seqs

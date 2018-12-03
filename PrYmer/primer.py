@@ -1,5 +1,6 @@
 from Bio.Seq import Seq
 from Bio.Alphabet import generic_alphabet
+import sys
 
 class Primer(Seq):
     """A class to represent a primer sequence (Extends Bio.Seq.Seq).
@@ -30,6 +31,20 @@ class Primer(Seq):
         self._tmtype = tmtype
         self.alphabet = alphabet
 
+        assert len(data) > len(str(length)), "Primer sequences must be shorter than the sequence they target."
+        try:
+            direction
+        except NameError:
+            sys.stderr.write("Primers need a direction specified ('F'/'R').")
+        try:
+            name
+        except NameError:
+            sys.stderr.write("Primers need a base name string specified.")
+        try:
+            data
+        except NameError:
+            sys.stderr.write("Primers need a sequence to derive from pecified.")
+
         self.primerseq = self.create_sequence(self._data, self.direction, self.length, self._method)
 
 #    def __repr__(self, name, _data):
@@ -50,14 +65,14 @@ class Primer(Seq):
             elif direction == 'R':
                 return _data[-length:].reverse_complement()
 
-
-    def melting_temperature(self, primerseq, tmtype):
-        """Calculate a melting temperature for the oligo according to different methods"""
-
-        from Bio.SeqUtils import MeltingTemp as mt
-        melt_method = {'wallace': mt.Tm_Wallace,
-                       'default': mt.Tm_NN,
-                       'gc': mt.Tm_GC,
-                       'corrected': mt.Tm_NN}.get(tmtype, lambda: "No such method.")
-        melt_method(primerseq)
-
+    #
+    # def melting_temperature(self, primerseq, tmtype):
+    #     """Calculate a melting temperature for the oligo according to different methods"""
+    #
+    #     from Bio.SeqUtils import MeltingTemp as mt
+    #     melt_method = {'wallace': mt.Tm_Wallace,
+    #                    'default': mt.Tm_NN,
+    #                    'gc': mt.Tm_GC,
+    #                    'corrected': mt.Tm_NN}.get(tmtype, lambda: "No such method.")
+    #     melt_method(primerseq)
+    #
