@@ -3,7 +3,10 @@
 """
 Design of primer sequences easily from a provided sequence file.
 """
-
+# TODO:
+#  - Create a Tm calculator
+#  - 'Gradient descent' style primer pair optimisation of Tms etc
+#  - Self and hetero-dimer analysis (one day perhaps).
 
 import sys
 import os
@@ -46,8 +49,9 @@ def get_args():
                             help='Print additional information about the designed sequences (to STDERR')
         parser.add_argument('-l,', '--length', action='store', default=20, type=int,
                              help='Desired length of primer sequences.')
-        parser.add_argument('-o', '--outfmt', action='store', choices=['fasta', 'comma', 'semi'], default='fasta',
-                            help='What file type to output the primers as (fasta, comma-separated, semicolon-separated)')
+        parser.add_argument('-s', '--separator', action='store', default='fasta',
+                            help='What file type to output the primers as (fasta, or separated by delimiter of choice.)'
+                                 'Should be specified in quotes, e.g. \',\' or \';\'.')
         parser.add_argument('sequences', action='store',
                             help='The sequence file to design primers for. '
                                  'It is assumed all sequences are provided 5\' -> 3\' ')
@@ -89,19 +93,12 @@ def main():
             sys.stderr.write("Reverse Primer (5\'-> 3\') = " + str(c.seq) + "\n")
 
     if args.outfile:
-        if not args.outfmt or args.outfmt == 'fasta':
+        if not args.separator or args.separator == 'fasta':
             SeqIO.write((i for i in itertools.chain(*zip(Fprimers, Rprimers))), args.outfile, 'fasta')
-        elif args.outfmt == ('comma' or 'semi'):
+        else:
             with open(args.outfile, 'w') as tfh:
-                if args.outfmt == "comma":
-                    sep = ','
-                elif args.outfmt == "semi":
-                    sep = ";"
-                else:
-                    sys.stderr.write('Tabular format requires specifying either of "semi"(colon) or "comma".')
-                    sys.exit(1)
                 for i in itertools.chain(*zip(Fprimers, Rprimers)):
-                    tfh.write(sep.join([str(i.id + i.description), str(i.seq) + "\n"]))
+                    tfh.write(args.separator.join([str(i.id + i.description), str(i.seq) + "\n"]))
 
 
 if __name__ == '__main__':
