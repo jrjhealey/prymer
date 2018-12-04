@@ -79,8 +79,8 @@ def main():
     for rec in seqs:
         f = Primer(rec.id, rec.seq, length=args.length, direction='F')
         r = Primer(rec.id, rec.seq, length=args.length, direction='R')
-        Fprimers.append(SeqRecord(f, id=f.name, description="_" + f.direction))
-        Rprimers.append(SeqRecord(r, id=r.name, description="_" + r.direction))
+        Fprimers.append(SeqRecord(f, id=f.name + "_" + f.direction, description=''))
+        Rprimers.append(SeqRecord(r, id=r.name + "_" + r.direction, description=''))
 
     if args.verbose:
         for a, b, c in zip(seqs, Fprimers, Rprimers):

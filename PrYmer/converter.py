@@ -1,4 +1,8 @@
 # A converter function to allow multiple input sequence types
+# Big thanks to Peter van Heusden for refactoring the genbank code to yeild generators!
+import os
+from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
 
 class InputFormatException(Exception):
     """The exception to return when an input format cannot be identified or coerced (informative name)"""
@@ -6,43 +10,31 @@ class InputFormatException(Exception):
         super().__init__(message)
 
 
+def yield_from_genbank(infile):
+    for rec in SeqIO.parse(infile, 'genbank'):
+        cds_features = (f for f in rec.features if f.type == 'CDS')
+        for feat in cds_features:
+            try:
+                header = feat.qualifiers['gene'][0] + '_' + rec.id
+            except KeyError:
+                header = feat.qualifiers['locus_tag'][0] + '_' + rec.id
+            header.replace(' ', '_')
+            yield SeqRecord(id=header, seq=feat.location.extract(rec).seq)
+
+
 def convert_seqs(infile):
-    """Consume an input file of sequences, do basic tests on format and convert to multifasta"""
-    from Bio import SeqIO
-    from tempfile import NamedTemporaryFile
-    import os
-
     with open(infile, 'r') as ifh:
-       firstline = ifh.readline()
-
-    # Begin testing formats:
+        firstline = ifh.readline()
     if os.path.splitext(infile)[1] in (".fasta", ".fa", ".fas", ".fna"):
-        # Give the benefit of the doubt by first testing the extension, but check that its well formed
         try:
             assert firstline[0] == '>'
         except AssertionError:
             raise InputFormatException("File extension implies fasta but the first line doesn't look like a header.")
         return SeqIO.parse(infile, 'fasta')
-
     elif os.path.splitext(infile)[1] in (".gbk", ".gb", ".genbank", ".gbff"):
         try:
             assert firstline.startswith("LOCUS")
         except AssertionError:
             raise InputFormatException("File extension implies genbank, but the first line doesn't look like a header.")
-    # Genbank will need features extracted if CDSs
-        temp = NamedTemporaryFile(mode='w+a', delete=False)
-        for rec in SeqIO.parse(infile, 'genbank'):
-            all_features = [feat for feat in rec.features if feat.type == "CDS"]
-            for f in all_features:
-                try:
-                    header = f.qualifiers['gene'][0] + "_" + rec.id
-                except KeyError:
-                    header = f.qualifiers['locus_tag'][0] + "_" + rec.id
-                header = header.replace(' ', '_')
-                temp.write('>{}\n{}\n'.format(header, f.location.extract(rec).seq))
 
-        temp.close()
-        genbank_seqs = SeqIO.parse(temp.name, 'fasta')
-        print(temp.name)
-        #os.remove(temp.name)
-        return genbank_seqs
+        return yield_from_genbank(infile)
