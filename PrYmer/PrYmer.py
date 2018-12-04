@@ -9,7 +9,6 @@ Design of primer sequences easily from a provided sequence file.
 #  - Self and hetero-dimer analysis (one day perhaps).
 
 import sys
-import os
 import argparse
 import itertools
 from primer import Primer
@@ -36,8 +35,6 @@ or, alternatively with python/pip:
     sys.exit(1)
 
 
-
-
 def get_args():
     """Parse command line arguments"""
     desc = """Return primers for given input sequences."""
@@ -48,17 +45,15 @@ def get_args():
         parser.add_argument('-v', '--verbose', action='store_true',
                             help='Print additional information about the designed sequences (to STDERR')
         parser.add_argument('-l,', '--length', action='store', default=20, type=int,
-                             help='Desired length of primer sequences.')
+                            help='Desired length of primer sequences.')
         parser.add_argument('-s', '--separator', action='store', default='fasta',
                             help='What file type to output the primers as (fasta, or separated by delimiter of choice.)'
                                  'Should be specified in quotes, e.g. \',\' or \';\'.')
         parser.add_argument('sequences', action='store',
                             help='The sequence file to design primers for. '
                                  'It is assumed all sequences are provided 5\' -> 3\' ')
-        parser.add_argument('outfile', action='store',default=None,
+        parser.add_argument('outfile', action='store', default=None,
                             help='Output file of primers in fasta format.')
-
-
 
         if len(sys.argv) == 1:
             parser.print_help(sys.stderr)
