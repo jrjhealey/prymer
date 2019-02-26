@@ -13,5 +13,5 @@ setup(name='prymer',
       author_email='jrj.healey@gmail.com',
       license='MIT',
       packages=['prymer'],
-      install_requires=['biopython']
+      install_requires=['biopython'],
       zip_safe=False)

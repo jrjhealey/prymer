@@ -30,7 +30,7 @@ def get_args():
                             help='Print additional information about the designed sequences (to STDERR')
         parser.add_argument('-l,', '--length', action='store', default=20, type=int,
                             help='Desired length of primer sequences.')
-        parser.add_argument('-s', '--separator', action='store', default='fasta',
+        parser.add_argument('-s', '--separator', action='store', default='fasta', type=str,
                             help='What file type to output the primers as (fasta, or separated by delimiter of choice.)'
                                  'Should be specified in quotes, e.g. \',\' or \';\'.')
         parser.add_argument('sequences', action='store',
@@ -55,7 +55,6 @@ def main():
     args = get_args()
 
     seqs = list(convert_seqs(args.sequences))
-    # If a tempfile was created by convert_seqs, remove it
 
     Fprimers = []
     Rprimers = []
