@@ -41,7 +41,7 @@ def get_args():
     epi = """Easy peasy primer design."""
 
     try:
-        parser = argparse.ArgumentParser(description=desc, epilog=epi, prog='PrYmer.py')
+        parser = argparse.ArgumentParser(description=desc, epilog=epi, prog='prymer.py')
         parser.add_argument('-v', '--verbose', action='store_true',
                             help='Print additional information about the designed sequences (to STDERR')
         parser.add_argument('-l,', '--length', action='store', default=20, type=int,
