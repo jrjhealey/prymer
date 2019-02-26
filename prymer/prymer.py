@@ -11,28 +11,12 @@ Design of primer sequences easily from a provided sequence file.
 import sys
 import argparse
 import itertools
+
+from Bio import SeqIO
+from Bio.SeqRecord import SeqRecord
+
 from primer import Primer
 from converter import convert_seqs
-
-try:
-    from Bio import SeqIO
-    from Bio.SeqRecord import SeqRecord
-except ImportError:
-    msg = """
-Could not import the BioPython module which means it is probably
-not installed, or at least not available in the PYTHONPATH for this 
-particular binary.
-
-If you have conda (recommended) try running:
-
- $ conda install -c anaconda biopython
-
-or, alternatively with python/pip:
-
- $ python -m pip install biopython
-"""
-    sys.stderr.write(msg)
-    sys.exit(1)
 
 
 def get_args():
@@ -94,7 +78,6 @@ def main():
             with open(args.outfile, 'w') as tfh:
                 for i in itertools.chain(*zip(Fprimers, Rprimers)):
                     tfh.write(args.separator.join([str(i.id + i.description), str(i.seq) + "\n"]))
-
 
 if __name__ == '__main__':
     main()

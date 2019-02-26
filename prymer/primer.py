@@ -15,7 +15,7 @@ class Primer(Seq):
     """
 
     def __init__(self, name, data, length=int(20), tm=float(65), direction=None,
-                 alphabet=generic_alphabet):
+                 method="simple", alphabet=generic_alphabet):
         """Create and store a primer with a name, sequence, and optionally a direction/alphabet.
            'method' is used as a switch to decide how to design the primer."""
 
@@ -24,6 +24,7 @@ class Primer(Seq):
         self.length = length
         self.tm = tm
         self.direction = direction
+        self.method = method
         self.alphabet = alphabet
 
         assert len(data) > len(str(length)), "Primer sequences must be shorter than the sequence they target."
@@ -54,10 +55,10 @@ class Primer(Seq):
     def create_sequence(self):
         """Return primer sequences for the input data
         """
-        if self._method == 'simple':     # Make bracketed sequence around provided sequence (this is the standard functionality)
+        if self.method == 'simple':     # Make bracketed sequence around provided sequence (this is the standard functionality)
             if self.direction == 'F':
                 return self._data[0:self.length]
-            elif direction == 'R':
+            elif self.direction == 'R':
                 return self._data[-self.length:].reverse_complement()
 
     #
