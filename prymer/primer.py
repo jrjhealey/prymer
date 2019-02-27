@@ -57,7 +57,6 @@ class Primer(Seq):
         elif self.direction == 'R':
             return self._data[-self.length:].reverse_complement()
 
-
     def melting_temperature(self):
         """
         Calculate assorted melting temperatures for the oligo.
